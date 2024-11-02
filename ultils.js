@@ -212,7 +212,7 @@ class BaseRoot {
     }
   }
 
-  async countdown(seconds) {
+  async countdownSeconds(seconds) {
     for (let i = seconds; i >= 0; i--) {
       const timestamp = new Date().toLocaleTimeString();
       readline.cursorTo(process.stdout, 0);

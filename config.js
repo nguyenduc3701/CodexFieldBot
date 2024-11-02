@@ -29,6 +29,6 @@ const METHOD = {
 
 const ToolName = "CodexField";
 
-const randPoint = 176;
+const randPoint = 154;
 
 module.exports = { questions, questionTypes, ToolName, METHOD, randPoint };

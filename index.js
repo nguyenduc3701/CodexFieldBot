@@ -19,7 +19,6 @@ class Tools extends BaseRoot {
     super();
     this.toolsName = ToolName || "";
     this.version = "1.0";
-    this.waitingTime = 0;
     this.userInfo = null;
     this.gameTickets = null;
     this.randPoint = randPoint;
@@ -32,6 +31,12 @@ class Tools extends BaseRoot {
       isDoTask: false,
     };
   }
+
+  addingWaitingTime = (extraTime) => {
+    if (this.waitingTime < extraTime) {
+      this.waitingTime = this.waitingTime + (extraTime - this.waitingTime);
+    }
+  };
 
   async renderQuestions() {
     for (let i = 0; i < questions.length; i++) {
@@ -140,15 +145,14 @@ class Tools extends BaseRoot {
     }
     const myTicketCount = this.gameTickets.ticketCount;
     this.log(colors.yellow(`Game ticket :${myTicketCount}`));
-    const header = this.getHeader(
+    const header = await this.getHeader(
       { "Content-Type": "application/json; charset=utf-8", Accept: "*/*" },
       ["Content-Type", "Accept"],
       false
     );
     for (let i = 0; i < myTicketCount; i++) {
       this.log(colors.yellow(`Play game ticket ${i + 1}...`));
-      await this.sleep(3000);
-      console.log(header);
+      await this.sleep(30000);
       try {
         const point = Math.floor(Math.random() * (15 - 13 + 1)) + 13;
         const request = { Points: point };
@@ -158,15 +162,14 @@ class Tools extends BaseRoot {
           request,
           header
         );
-        console.log(response);
         if (response && response.data.code === 0) {
           this.log(colors.green(`Claim ${point} successfully!`));
           this.delayTime.playGame = this.addHoursToDatetime(4);
+          this.addingWaitingTime(4 * 60 * 60);
         } else {
           this.log(colors.red(`Fail to claim play game!`));
         }
       } catch (error) {
-        console.log(error);
         this.log(colors.red(`Fail to claim play game!`));
       }
     }
@@ -192,31 +195,31 @@ class Tools extends BaseRoot {
       } else {
         this.log(colors.red(`Fail to get game tickets!`));
       }
-      // await this.sleep(1000);
-      // const responseConsume = await this.callApi(
-      //   METHOD.POST,
-      //   "https://api.codexfield.com/api/1/minigame/ticket/consume",
-      //   null,
-      //   header
-      // );
-      // if (responseConsume && responseConsume.data.code === 0) {
-      //   this.log(colors.green(`Get tickets successfully!`));
-      //   if (response.data.data) {
-      //     this.gameTickets = response.data.data;
-      //   }
-      // } else {
-      //   this.log(colors.red(`Fail to get game tickets!`));
-      // }
+      await this.sleep(1000);
+      const responseConsume = await this.callApi(
+        METHOD.POST,
+        "https://api.codexfield.com/api/1/minigame/ticket/consume",
+        null,
+        header
+      );
+      if (responseConsume && responseConsume.data.code === 0) {
+        this.log(colors.green(`Get cunsume successfully!`));
+        if (response.data.data) {
+          this.gameTickets = response.data.data;
+        }
+      } else {
+        this.log(colors.red(`Fail to get game cunsume!`));
+      }
       await this.sleep(1000);
     } catch (error) {
-      this.log(colors.red(`Fail to get game tickets!`));
+      this.log(colors.red(`Fail to get game cunsume!`));
       return;
     }
   };
 
   resolveTask = async (queryId, dataUser, token) => {
     this.log(colors.yellow(`====== [Resolve Task] ======`));
-    const header = this.getHeader();
+    const header = await this.getHeader();
     await this.getTasks();
     await this.sleep(1000);
     if (!this.tasks || !this.tasks?.socialTasks?.length) {
@@ -252,11 +255,12 @@ class Tools extends BaseRoot {
         this.log(colors.red(`Fail claim task ${task.taskType}!`));
       }
     }
+    this.addingWaitingTime(4 * 60 * 60);
   };
 
   getTasks = async () => {
     this.log(colors.yellow(`====== [Checking Tasks] ======`));
-    const header = this.getHeader();
+    const header = await this.getHeader();
     try {
       const response = await this.callApi(
         METHOD.GET,
@@ -264,7 +268,6 @@ class Tools extends BaseRoot {
         null,
         header
       );
-      console.log(response);
       if (response && response.data.code === 0) {
         this.log(colors.green(`Get tasks successfully!`));
         if (response.data.data) {
@@ -349,7 +352,7 @@ class Tools extends BaseRoot {
         await this.processAccount(queryId, dataUser);
       }
       const extraMinutes = 1 * 60;
-      await this.countdown(this.waitingTime + extraMinutes);
+      await this.countdownSeconds(extraMinutes);
     }
   }
 }
