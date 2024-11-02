@@ -1,16 +1,6 @@
 const fs = require("fs");
-const axios = require("axios");
 const colors = require("colors");
-const readline = require("readline");
-const { DateTime } = require("luxon");
-const { HttpsProxyAgent } = require("https-proxy-agent");
-const {
-  questions,
-  questionTypes,
-  ToolName,
-  METHOD,
-  randPoint,
-} = require("./config");
+const { questions, ToolName, METHOD, randPoint } = require("./config");
 
 const BaseRoot = require("./ultils");
 
@@ -70,7 +60,7 @@ class Tools extends BaseRoot {
 
   login = async (queryId, dataUser) => {
     this.log(colors.yellow(`====== [Login] ======`));
-    const header = this.getHeader();
+    const header = await this.getHeader();
     try {
       const request = {
         initDataRaw: queryId,
@@ -90,9 +80,11 @@ class Tools extends BaseRoot {
         }
       } else {
         this.log(colors.red(`Fail to login ${this.toolsName}!`));
+        return;
       }
     } catch (error) {
       this.log(colors.red(`Fail to login ${this.toolsName}!`));
+      return;
     }
   };
 
