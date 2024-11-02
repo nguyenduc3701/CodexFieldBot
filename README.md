@@ -35,6 +35,7 @@ Tool for CodexField on Telegram
 <summary>v0.1 - 📅 02/11/2024</summary>
 - Provide resources for a preliminary look.
 </details>
+
 ## Note
 
 - You should get `randPoint` value from devTools -> Application -> `login_points_xxxxx` or use my random randPoint( Not Recommand ).
